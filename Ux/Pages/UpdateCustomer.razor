@@ -1,0 +1,187 @@
+﻿@page "/UpdateCustomer/{cid}"
+@using System.Net.Http.Json
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@* @using System.Text.Json *@
+@using Newtonsoft.Json
+@using System.Text
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<h5>Edit Customer</h5>
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+<EditForm Model="@customer" OnValidSubmit="@Submit" FormName="UpdateCustomer" @ref="editForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+        <div class="form-group row">
+            <label for="CustomerId" class="col-sm-2 col-form-label">
+                Customer ID
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.CustomerID" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="CustomerName" class="col-sm-2 col-form-label">
+                Customer Name
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.CustomerName" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="CustomerAddress1" class="col-sm-2 col-form-label">
+                Customer Address 1
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.CustomerAddress1" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="CustomerAddress2" class="col-sm-2 col-form-label">
+                Customer Address 2
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.CustomerAddress2" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="PhoneNo" class="col-sm-2 col-form-label">
+                Phone No
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.PhoneNo" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Email" class="col-sm-2 col-form-label">
+                Email
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.Email" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Language" class="col-sm-2 col-form-label">
+                Language
+            </label>
+            <div class="col-sm-10">
+                <InputText @bind-Value="@customer.Language" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Height" class="col-sm-2 col-form-label">
+                Height
+            </label>
+            <div class="col-sm-10">
+                <InputNumber @bind-Value="@customer.Height" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Weight" class="col-sm-2 col-form-label">
+                Weight
+            </label>
+            <div class="col-sm-10">
+                <InputNumber @bind-Value="@customer.Weight" />
+            </div>
+        </div>
+
+        <div>
+        <button type="submit" >Submit</button>
+        </div>
+    </EditForm>
+
+
+@code {
+    [Parameter]
+    public string cid { get; set; }
+    private string errorMessage;
+
+    private EditForm editForm;
+
+    public CustomerVM customer { get; set; } = new CustomerVM();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(cid))
+        {
+            await LoadCustomer(int.Parse(cid));
+        }
+    }
+
+    private async Task LoadCustomer(int Id)
+    {
+        try
+        {
+            var response = await HttpClient.GetAsync($"https://localhost:7010/api/Customer/GetCustomerById/{Id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                customer = JsonConvert.DeserializeObject<CustomerVM>(json);
+                editForm.EditContext.Validate();
+               
+                StateHasChanged();
+
+            }
+
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = "An error occurred while fetching customer data: "+ ex.Message.ToString();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An unexpected error occurred: " + ex.Message;
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            var json = JsonConvert.SerializeObject(customer);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await HttpClient.PutAsync($"https://localhost:7010/api/Customer/{cid}", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadCustomer(int.Parse(cid)); 
+                NavigationManager.NavigateTo("/CustomerList");
+
+            }
+            else
+            {
+                errorMessage= "Failed to update customer.";
+            }
+            
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = "An error occurred while submitting customer data: " + ex.Message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An unexpected error occurred: " + ex.Message;
+        }
+    }
+
+    public class CustomerVM
+    {
+        public string CustomerID { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerAddress1 { get; set; }
+        public string CustomerAddress2 { get; set; }
+        public string PhoneNo { get; set; }
+        public string Email { get; set; }
+        public string Language { get; set; }
+        public double Height { get; set; }
+        public double Weight { get; set; }
+    }
+}

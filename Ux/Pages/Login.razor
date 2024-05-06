@@ -1,0 +1,74 @@
+﻿@page "/Login"
+@layout SurveyPrompt
+
+@inject HttpClient httpClient
+@inject NavigationManager _navigationManager
+@using System.Net.Http;
+@using System.Text;
+@using Newtonsoft.Json; 
+
+<h3>Login</h3>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+<form @onsubmit="LoginUser" method="post" formname="Login" >
+    <AntiforgeryToken />
+    <div class="form-group row">
+        <label for="Password" class="col-sm-2 col-form-label">
+            User Name
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="user.UserName" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Password" class="col-sm-2 col-form-label">
+           Password
+        </label>
+        <div class="col-sm-10">
+            <input type="password" id="Password" @bind="user.Password" />
+        </div>
+    </div>
+    
+    <button type="submit">Login</button>
+</form>
+
+@code {
+    public UserVM user { get; set; } = new UserVM();
+    private string errorMessage;
+
+    private async Task LoginUser()
+    {
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync("login/api/login", user);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _navigationManager.NavigateTo("/CustomerList");
+            }
+            else
+            {
+                // Login failed, display error message
+                errorMessage = "Invalid username or password";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred while logging in \n error message: "+ ex.ToString();
+        }
+    }
+
+    public class UserVM
+    {
+        public string UserName { get; set; }
+        public string userFullName { get; set; }
+        public string Password { get; set; }
+        public string Email { get; set; }
+    }
+}

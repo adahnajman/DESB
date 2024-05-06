@@ -1,0 +1,148 @@
+﻿@page "/AddCustomer"
+@using System.Net.Http.Json
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Add New Customer</PageTitle>
+<form method="post" @onsubmit="Submit" @formname="AddCustomer">
+    <AntiforgeryToken />
+    <div class="form-group row">
+        <label for="CustomerId" class="col-sm-2 col-form-label">
+            Customer ID
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="customer.CustomerID" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="CustomerName" class="col-sm-2 col-form-label">
+            Customer Name
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="customer.CustomerName" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="CustomerAddress1" class="col-sm-2 col-form-label">
+            Customer Address 1
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="customer.CustomerAddress1" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="CustomerAddress2" class="col-sm-2 col-form-label">
+            Customer Address 2
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="customer.CustomerAddress2" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="PhoneNo" class="col-sm-2 col-form-label">
+            Phone No
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="customer.PhoneNo" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Email" class="col-sm-2 col-form-label">
+            Email
+        </label>
+        <div class="col-sm-10">
+            <InputText @bind-Value="customer.Email" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Language" class="col-sm-2 col-form-label">
+            Language
+        </label>
+        <div class="col-sm-10">
+            <InputSelect @bind-Value="customer.Language" class="form-control" style="width:auto; margin-bottom:15px" multiple>
+                @foreach (var item in myVar)
+                {
+                    <option value="@item.SlctValue">@item.SlctName</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Height" class="col-sm-2 col-form-label">
+            Height
+        </label>
+        <div class="col-sm-10">
+            <InputNumber @bind-Value="customer.Height" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Weight" class="col-sm-2 col-form-label">
+            Weight
+        </label>
+        <div class="col-sm-10">
+            <InputNumber @bind-Value="customer.Weight" />
+        </div>
+    </div>
+
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+@code {
+    [SupplyParameterFromForm]
+    public CustomerVM customer { get; set; } = new CustomerVM();
+    private List<string> selectedLanguages = new List<string>();
+
+    private async Task Submit()
+    {
+        try
+        {
+            customer.Language = selectedLanguages;
+            var response = await HttpClient.PostAsJsonAsync("Customer/AddNewCustomer", customer);
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/CustomerList");
+            }
+            else
+            {
+                Console.WriteLine("Failed to add customer.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
+    public class CustomerVM
+    {
+        public string CustomerID { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerAddress1 { get; set; }
+        public string CustomerAddress2 { get; set; }
+        public string PhoneNo { get; set; }
+        public string Email { get; set; }
+        public List<string> Language { get; set; } = new List<string>();
+        public double Height { get; set; }
+        public double Weight { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    private List<SelectModel> myVar = new List<SelectModel>()
+    {
+        new SelectModel(){ SlctValue = "BM", SlctName="BM" },
+        new SelectModel(){ SlctValue = "EN", SlctName="EN" },
+        new SelectModel(){ SlctValue = "FR", SlctName="FR"},
+        new SelectModel(){ SlctValue = "CH", SlctName="CH" },
+    };
+
+    public class SelectModel
+    {
+        public string SlctName { get; set; }
+        public string SlctValue { get; set; }
+    }
+}

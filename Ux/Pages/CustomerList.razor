@@ -1,0 +1,203 @@
+﻿@page "/CustomerList"
+@using System.Net.Http.Json
+@using System.Net.Http
+@inject HttpClient HttpClient
+
+<h5>List of Customer</h5>
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+<a href="AddCustomer" class="btn btn-primary" style="align-item:text-right">Add Customer</a>
+
+<EditForm Model="search" OnValidSubmit="@Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label for="Searching" class="col-sm-2 col-form-label">
+        Filter
+    </label>
+    <InputText id="data" @bind-Value="search.data" />
+    <ValidationMessage For="@(() => search.data)" />
+
+    <button type="submit">Search</button>
+    <button type="reset">Reset</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th>Customer Address</th>
+            <th>Contact No</th>
+            <th>Language</th>
+            <th>Height / Weight</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var no = 1;
+        }
+        @if (Customer != null)
+        {
+            foreach (var customer in Customer)
+            {
+                <tr>
+                    <td>@no</td>
+                    <td>@customer.CustomerID</td>
+                    <td>@customer.CustomerName</td>
+                    @if(@customer.CustomerAddress2 != null)
+                    {
+                        <td>@customer.CustomerAddress1, @customer.CustomerAddress2</td>
+
+                    }else
+                    {
+                        <td>@customer.CustomerAddress1</td>
+                    }
+                    <td>@customer.PhoneNo</td>
+                    <td>@customer.Language</td>
+                    <td>@customer.Height / @customer.Weight</td>
+                    <td>
+                        <a href="/UpdateCustomer/@customer.Id" class="btn btn-primary">Update</a>
+                        <button @onclick="@(async () => await DeleteCustomer(customer.Id))" class="btn btn-danger">Delete</button>
+
+                    </td>
+                </tr>
+                no++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="8" style="text-align:center">No customers found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public SearchVM search { get; set; } = new SearchVM();
+
+    private List<CustomerVM>? Customer;
+
+    private bool isSearching = false;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        try
+        {
+            var response = await HttpClient.GetAsync("Customer/GetCustomerList");
+            if (response.IsSuccessStatusCode)
+            {
+                Customer = await response.Content.ReadFromJsonAsync<List<CustomerVM>>();
+            }
+            else
+            {
+                // Handle error scenario
+                // Display error message or take appropriate action
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exception
+            // Log the exception or display a generic error message
+        }
+    }
+
+    private async Task DeleteCustomer(int? id)
+    {
+        if (id != null)
+        {
+            try
+            {
+                var response = await HttpClient.DeleteAsync($"Customer/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadCustomers();
+                }
+                else
+                {
+                    // Handle error scenario
+                    // Display error message or take appropriate action
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                // Log the exception or display a generic error message
+            }
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            isSearching = true;
+            errorMessage = "";
+
+            if (!string.IsNullOrEmpty(search.data))
+            {
+                var response = await HttpClient.GetFromJsonAsync<IEnumerable<CustomerVM>>($"Customer/SearchData?data={Uri.EscapeDataString(search.data)}");
+                if (response != null && response.Any())
+                {
+                    Customer = response.ToList();
+                }
+                else
+                {
+                    // Handle if no data is found
+                    errorMessage = "No data found.";
+                }
+            }
+            else
+            {
+                errorMessage = "Search data is empty.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            isSearching = false;
+        }
+    }
+
+    public class SearchVM
+    {
+        public string data { get; set; }
+    }
+
+    public class CustomerVM
+    {
+        public int? Id { get; set; }
+        public string? CustomerID { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerAddress1 { get; set; }
+        public string? CustomerAddress2 { get; set; }
+        public string? PhoneNo { get; set; }
+        public string? Email { get; set; }
+        public string? Language { get; set; }
+        public double? Height { get; set; }
+        public double? Weight { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
+    }
+}
