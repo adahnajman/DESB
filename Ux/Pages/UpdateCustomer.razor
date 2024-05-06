@@ -71,13 +71,14 @@
             <label for="Language" class="col-sm-2 col-form-label">
                 Language
             </label>
-            @* <select @bind="customer.Language" class="custom-select custom-select-sm tagging" name="Language" multiple>
+            <select @bind="customer.Language" class="custom-select custom-select-sm tagging" name="Language" multiple>
                 <option value="">Please Choose</option>
                 @foreach (var item in customer.listLanguage)
                 {
-                    <option value="@item.Value">@item.Text</option>
+                    <option value="@item.Value" @(customer.Language.Contains(item.Value) ? "selected" : "" )>@item.Text</option>
                 }
-            </select> *@
+            </select>
+
         </div>
         <div class="form-group row">
             <label for="Height" class="col-sm-2 col-form-label">
@@ -130,7 +131,6 @@
             {
                 var json = await response.Content.ReadAsStringAsync();
                 customer = JsonConvert.DeserializeObject<CustomerVM>(json);
-               
                 editForm.EditContext.Validate();
                
                 StateHasChanged();
@@ -196,10 +196,11 @@
         public CustomerVM()
         {
             listLanguage = new List<SelectListItem>
-        {
-            new SelectListItem { Text = "BM", Value = "BM" },
-            new SelectListItem { Text = "BI", Value = "BI" }
-        };
+            {
+                new SelectListItem { Text = "BM", Value = "BM" },
+                new SelectListItem { Text = "BI", Value = "BI" }
+            };
+            Language = new List<string>();
         }
     }
 
