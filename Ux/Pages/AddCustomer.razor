@@ -10,6 +10,7 @@
 
 <head>
     <link rel="stylesheet" href="/css/plugins/select2/select2.min.css" />
+
     <script src="/css/jquery-3.6.0.min.js"></script>
     <script src="/css/plugins/select2/select2.min.js"></script>
     <script src="/css/plugins/select2/custom-select2.js"></script>
@@ -90,9 +91,8 @@
         <label for="Language" class="col-sm-2 col-form-label">
             Language
         </label>
-        <div class="col-sm-6">
-            <select @bind="customer.Language" class="form-control custom-select custom-select-sm tagging" >
-                <option value="">Please Choose</option>
+        <div class="col-sm-4">
+            <select @bind="customer.Language" class="custom-select custom-select-sm tagging" name="Language" multiple>
                 @foreach (var item in customer.listLanguage)
                 {
                     <option value="@item.Value">@item.Text</option>
@@ -126,6 +126,12 @@
     public CustomerVM customer { get; set; } = new CustomerVM();
     private string errorMessage;
     Dictionary<string, List<string>> errorMessages = new Dictionary<string, List<string>>();
+
+    protected override void OnInitialized()
+    {
+        customer = new CustomerVM();
+    }
+
 
     private async Task Submit()
     {
@@ -180,6 +186,7 @@
         };
         }
     }
+
 
     public class ErrorResponse
     {
