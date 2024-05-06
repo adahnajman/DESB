@@ -35,7 +35,6 @@ namespace Exercise.Models.ViewModel
         public DateTime? CreatedAt { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set;}
-
     }
 
     public class SearchVM
