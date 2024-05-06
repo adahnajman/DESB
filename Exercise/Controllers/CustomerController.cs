@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Exercise.Controllers
@@ -40,7 +41,7 @@ namespace Exercise.Controllers
                         a.CustomerAddress2 = customer.CustomerAddress2;
                         a.Email = customer.Email;
                         a.PhoneNo = customer.PhoneNo;
-                        a.Language = string.Join(",", customer.Language);
+                        a.Language = JsonConvert.SerializeObject(customer.Language);
                         a.Height = customer.Height;
                         a.Weight = customer.Weight;
                         a.CreatedBy = 1;
@@ -102,7 +103,7 @@ namespace Exercise.Controllers
                 existingCustomer.Email = customer.Email;
                 existingCustomer.Weight = customer.Weight;
                 existingCustomer.Height = customer.Height;
-                existingCustomer.Language = string.Join(",", customer.Language);
+                existingCustomer.Language = JsonConvert.SerializeObject(customer.Language);
                 existingCustomer.UpdatedBy = 1;
                 existingCustomer.UpdatedAt = DateTime.Now;
 
