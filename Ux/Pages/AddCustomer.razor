@@ -114,7 +114,6 @@
         customer = new CustomerVM();
     }
 
-
     private async Task Submit()
     {
         try
@@ -130,6 +129,8 @@
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
                     var errorObject = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
+                    errorMessage = "Failed to add customer. Please fix the following errors:";
+                    errorMessages = errorObject.Errors.ToDictionary(e => e.Key, e => e.Value.Values);
                 }
                 else
                 {
@@ -151,7 +152,7 @@
         public string CustomerAddress2 { get; set; }
         public string PhoneNo { get; set; }
         public string Email { get; set; }
-        public string Language { get; set; }
+        public string[] Language { get; set; }
         public List<SelectListItem> listLanguage { get; set; }
         public double Height { get; set; }
         public double Weight { get; set; }
@@ -161,10 +162,11 @@
         public CustomerVM()
         {
             listLanguage = new List<SelectListItem>
-        {
-            new SelectListItem { Text = "BM", Value = "BM" },
-            new SelectListItem { Text = "BI", Value = "BI" }
-        };
+            {
+                new SelectListItem { Text = "BM", Value = "BM" },
+                new SelectListItem { Text = "BI", Value = "BI" }
+            };
+            Language = new string[0];
         }
     }
 

@@ -42,7 +42,6 @@ namespace Exercise.Controllers
                         a.CustomerAddress2 = customer.CustomerAddress2;
                         a.Email = customer.Email;
                         a.PhoneNo = customer.PhoneNo;
-                        a.Language = JsonConvert.SerializeObject(customer.Language);
                         a.Height = customer.Height;
                         a.Weight = customer.Weight;
                         a.CreatedBy = 1;
