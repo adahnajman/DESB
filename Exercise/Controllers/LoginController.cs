@@ -46,7 +46,7 @@ namespace Exercise.Controllers
         {
             try
             {
-                var user = await _Context.TblUsers.SingleOrDefaultAsync(x => x.UserName == model.UserName && x.Password == HashHelper.ComputeMD5Hash(model.Password));
+                var user = await _Context.TblUsers.SingleOrDefaultAsync(x => x.UserName.Equals(model.UserName, StringComparison.Ordinal) && x.Password == HashHelper.ComputeMD5Hash(model.Password));
                 if (user != null)
                 {
                     var token = user;
