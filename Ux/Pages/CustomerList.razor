@@ -4,25 +4,29 @@
 @inject HttpClient HttpClient
 
 <h5>List of Customer</h5>
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger" role="alert">
-        @errorMessage
-    </div>
-}
-<a href="AddCustomer" class="btn btn-primary" style="align-item:text-right">Add Customer</a>
+
 
 <EditForm Model="search" OnValidSubmit="@Submit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <label for="Searching" class="col-sm-2 col-form-label">
-        Filter
-    </label>
-    <InputText id="data" @bind-Value="search.data" />
-    <ValidationMessage For="@(() => search.data)" />
+    <div class="col-md-10">
+    <div class="justify-content-center">
+        <div class="card mb-5">
+            <div class="card-body">
+                <label for="Searching" class="col-sm-2 col-form-label">
+                    Filter
+                </label>
+                <InputText id="data" @bind-Value="search.data" />
+                <ValidationMessage For="@(() => search.data)" />
 
-    <button type="submit">Search</button>
-    <button type="reset">Reset</button>
+                <div class="d-flex justify-content-center mt-3">
+                    <button type="submit" class="btn btn-primary" style="margin-right:9px">Search</button>
+                    <button type="button" @onclick="@(async () => await ResetForm())" class="btn btn-secondary">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 </EditForm>
 
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -31,6 +35,11 @@
         @errorMessage
     </div>
 }
+<div class="col-12">
+    <div class="right-align">
+        <a href="AddCustomer" class="btn btn-primary">Add Customer</a>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -145,6 +154,12 @@
         }
     }
 
+    private async Task ResetForm()
+    {
+        search.data = ""; 
+        await LoadCustomers(); 
+    }
+
     private async Task Submit()
     {
         try
@@ -200,4 +215,6 @@
         public int? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
     }
+
+   
 }
