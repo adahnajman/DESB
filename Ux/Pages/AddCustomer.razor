@@ -8,6 +8,12 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
+@*< head>
+    <script src="css/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="css/plugins/select2/select2.min.css" />
+    <script src="css/plugins/select2/select2.min.js"></script>
+    <script src="css/plugins/select2/custom-select2.js"></script>
+</head> *@
 <h5>Add New Customer</h5>
 @if (errorMessage != null)
 {
@@ -70,7 +76,7 @@
         <div class="form-group row p-2">
             <label for="Language" class="col-sm-3 col-form-label">Language<span class="ml-1 text-danger">*</span></label>
             <div class="col-sm-9">
-                <select @bind="customer.Language" class="custom-select custom-select-sm tagging form-control" name="Language" id="language" multiple>
+                <select @bind="customer.Language" class="custom-select custom-select-sm tagging form-control" name="Language" multiple="multiple">
                     <option value="">Please Choose</option>
                     @foreach (var item in customer.listLanguage)
                     {
@@ -81,7 +87,7 @@
         </div>
         <div class="form-group row p-2">
             <label for="Height" class="col-sm-3 col-form-label">Height<span class="ml-1 text-danger">*</span></label>
-            <div class="col-sm-6 d-flex align-items-center">
+            <div class="col-sm-3 d-flex align-items-center">
                 <InputNumber @bind-Value="customer.Height" min="0" class="form-control" />
                 <span class="ml-2"> CM</span>
             </div>
@@ -180,4 +186,5 @@
     {
         public List<string> Values { get; set; }
     }
+
 }

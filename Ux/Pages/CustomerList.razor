@@ -2,10 +2,10 @@
 @using System.Net.Http.Json
 @using System.Net.Http
 @inject HttpClient HttpClient
+@inject NavigationManager _navigation
+@inject IJSRuntime JSRuntime
 
 <h5>List of Customer</h5>
-
-
 <EditForm Model="search" OnValidSubmit="@Submit">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -215,6 +215,40 @@
         public int? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
     }
+
+    private async Task<string> GetToken()
+    {
+        // Retrieve token from client-side storage
+        return await JSRuntime.InvokeAsync<string>("localStorageFunctions.getItem", "token");
+    }
+
+    private async Task Logout()
+    {
+        try
+        {
+            var token = await GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                var response = await HttpClient.PostAsync("logout", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await JSRuntime.InvokeVoidAsync("localStorageFunctions.removeItem", "token");
+
+                    _navigation.NavigateTo("/");
+                }
+            }
+            else
+            {
+                _navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+
 
    
 }

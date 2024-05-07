@@ -1,4 +1,6 @@
 using Exercise.Data;
+using Exercise.Interfaces;
+using Exercise.Services;
 using FE.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection").ToString();
 
 builder.Services.AddControllers();
+builder.Services.AddTransient<ITokenService, TokenService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContextPool<CustomerContext>(options =>
