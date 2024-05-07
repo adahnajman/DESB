@@ -1,5 +1,7 @@
 ﻿using Exercise.Data;
+using Exercise.Interfaces;
 using Exercise.Models.ViewModel;
+using Exercise.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +18,12 @@ namespace Exercise.Controllers
     {
         public CustomerContext _Context { get; set; }
         private readonly ILogger<LoginController> _logger;
-        public LoginController(CustomerContext context, ILogger<LoginController> logger)
+        private readonly ITokenService _tokenService;
+        public LoginController(CustomerContext context, ILogger<LoginController> logger, ITokenService tokenService)
         {
             _Context = context;
             _logger = logger;
+            _tokenService = tokenService;
         }
 
         public static class HashHelper
@@ -49,8 +53,8 @@ namespace Exercise.Controllers
                 var user = await _Context.TblUsers.SingleOrDefaultAsync(x => x.UserName.Equals(model.UserName, StringComparison.Ordinal) && x.Password == HashHelper.ComputeMD5Hash(model.Password));
                 if (user != null)
                 {
-                    var token = user;
-
+                    var token = _tokenService.GenerateToken(model);
+                    Response.Cookies.Append("token", token);
                     return Ok(new { Token = token });
                 }
                 else
@@ -63,5 +67,13 @@ namespace Exercise.Controllers
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
+
+        [HttpPost]
+        [Route("logout")]
+        public IActionResult Logout()
+        {
+            return Ok();
+        }
+
     }
 }

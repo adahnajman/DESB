@@ -2,6 +2,7 @@
 
 @inject HttpClient httpClient
 @inject NavigationManager _navigationManager
+@inject IJSRuntime JSRuntime
 @using System.Net.Http;
 @using System.Text;
 @using System.Net;
@@ -59,6 +60,8 @@
 
                 if (response.IsSuccessStatusCode)
                 {
+                    var token = await response.Content.ReadAsStringAsync();
+                    await JSRuntime.InvokeVoidAsync("localStorageFunctions.setItem", "token", token);
                     _navigationManager.NavigateTo("/CustomerList");
                 }
                 else
@@ -108,4 +111,8 @@
         public List<string> Values { get; set; }
     }
 
+    private async Task<string> GetToken()
+    {
+        return await JSRuntime.InvokeAsync<string>("localStorageFunctions.getItem", "token");
+    }
 }
