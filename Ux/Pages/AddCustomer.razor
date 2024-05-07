@@ -8,14 +8,6 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
-<head>
-    <link rel="stylesheet" href="/css/plugins/select2/select2.min.css" />
-
-    <script src="/css/jquery-3.6.0.min.js"></script>
-    <script src="/css/plugins/select2/select2.min.js"></script>
-    <script src="/css/plugins/select2/custom-select2.js"></script>
-</head>
-
 <h5>Add New Customer</h5>
 @if (errorMessage != null)
 {
@@ -36,91 +28,81 @@
     </div>
 }
 
+<div class="container">
+    <form method="post" @onsubmit="Submit" formname="AddCustomer">
+        <AntiforgeryToken />
+        <div class="form-group row p-2">
+            <label for="CustomerId" class="col-sm-3 col-form-label">Customer ID<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-9">
+                <InputText @bind-Value="customer.CustomerID" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="CustomerName" class="col-sm-3 col-form-label">Customer Name<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-9">
+                <InputText @bind-Value="customer.CustomerName" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="CustomerAddress1" class="col-sm-3 col-form-label">Customer Address 1<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-9">
+                <InputText @bind-Value="customer.CustomerAddress1" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="CustomerAddress2" class="col-sm-3 col-form-label">Customer Address 2</label>
+            <div class="col-sm-9">
+                <InputText @bind-Value="customer.CustomerAddress2" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="PhoneNo" class="col-sm-3 col-form-label">Phone No<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-9">
+                <InputText @bind-Value="customer.PhoneNo" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="Email" class="col-sm-3 col-form-label">Email<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-9">
+                <InputText @bind-Value="customer.Email" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="Language" class="col-sm-3 col-form-label">Language<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-9">
+                <select @bind="customer.Language" class="custom-select custom-select-sm tagging form-control" name="Language" id="language" multiple>
+                    <option value="">Please Choose</option>
+                    @foreach (var item in customer.listLanguage)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="Height" class="col-sm-3 col-form-label">Height<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-6 d-flex align-items-center">
+                <InputNumber @bind-Value="customer.Height" min="0" class="form-control" />
+                <span class="ml-2"> CM</span>
+            </div>
+        </div>
+        <div class="form-group row p-2">
+            <label for="Height" class="col-sm-3 col-form-label">Height<span class="ml-1 text-danger">*</span></label>
+            <div class="col-sm-6 d-flex align-items-center">
+                <InputNumber @bind-Value="customer.Weight" min="0" class="form-control" />
+                <span class="ml-2"> KG</span>
+            </div>
+        </div>
 
-<form method="post" @onsubmit="Submit" formname="AddCustomer">
-    <AntiforgeryToken />
-    <div class="form-group row">
-        <label for="CustomerId" class="col-sm-2 col-form-label">
-            Customer ID
-        </label>
-        <div class="col-sm-10">
-            <InputText @bind-Value="customer.CustomerID" />
+        <div class="form-group row">
+            <div class="col-sm-9 offset-sm-3 right-align">
+                <button type="submit" class="btn btn-outline-primary" style="margin-right:4px">Submit</button>
+                <a href="javascript:void(0)" onclick="window.history.back();" class="btn btn-outline-danger">Back</a>
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label for="CustomerName" class="col-sm-2 col-form-label">
-            Customer Name
-        </label>
-        <div class="col-sm-10">
-            <InputText @bind-Value="customer.CustomerName" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="CustomerAddress1" class="col-sm-2 col-form-label">
-            Customer Address 1
-        </label>
-        <div class="col-sm-6">
-            <InputText @bind-Value="customer.CustomerAddress1" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="CustomerAddress2" class="col-sm-2 col-form-label">
-            Customer Address 2
-        </label>
-        <div class="col-sm-10">
-            <InputText @bind-Value="customer.CustomerAddress2" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="PhoneNo" class="col-sm-2 col-form-label">
-            Phone No
-        </label>
-        <div class="col-sm-10">
-            <InputText @bind-Value="customer.PhoneNo" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="Email" class="col-sm-2 col-form-label">
-            Email
-        </label>
-        <div class="col-sm-10">
-            <InputText @bind-Value="customer.Email" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="Language" class="col-sm-2 col-form-label">
-            Language
-        </label>
-        <div class="col-sm-4">
-            <select @bind="customer.Language" class="custom-select custom-select-sm tagging" name="Language" multiple>
-                @foreach (var item in customer.listLanguage)
-                {
-                    <option value="@item.Value">@item.Text</option>
-                }
-            </select>
-        </div>
-    </div><br />
-    <div class="form-group row">
-        <label for="Height" class="col-sm-2 col-form-label">
-            Height
-        </label>
-        <div class="col-sm-10">
-            <InputNumber @bind-Value="customer.Height" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="Weight" class="col-sm-2 col-form-label">
-            Weight
-        </label>
-        <div class="col-sm-10">
-            <InputNumber @bind-Value="customer.Weight" />
-        </div>
-    </div>
+    </form>
+</div>
 
-    <div>
-        <button type="submit">Submit</button>
-    </div>
-</form>
 
 @code {
     public CustomerVM customer { get; set; } = new CustomerVM();
@@ -151,9 +133,8 @@
                 }
                 else
                 {
-                    // Handle other error status codes
+                    errorMessage = "Failed to add customer.";
                 }
-                errorMessage = "Failed to add customer.";
             }
         }
         catch (Exception ex)

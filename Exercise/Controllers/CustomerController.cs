@@ -5,6 +5,7 @@ using Exercise.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
@@ -46,6 +47,9 @@ namespace Exercise.Controllers
                         a.Weight = customer.Weight;
                         a.CreatedBy = 1;
                         a.CreatedAt = DateTime.Now;
+
+                        string concatenatedLanguages = string.Join(",", customer.Language);
+                        a.Language = concatenatedLanguages;
                         _Context.TblCustomers.Add(a);
                         await _Context.SaveChangesAsync();
                     }
@@ -66,7 +70,7 @@ namespace Exercise.Controllers
 
         #region update
         [HttpGet("GetCustomerById/{Id}")]
-        public async Task<ActionResult> GetCustomerById(int Id)
+        public async Task<ActionResult<CustomerVM>> GetCustomerById(int Id)
         {
             try
             {
@@ -75,7 +79,26 @@ namespace Exercise.Controllers
                 {
                     return NotFound();
                 }
-                return Ok(existingCustomer);
+
+                var languages = existingCustomer.Language.Split(',').ToList(); 
+
+                var customerVM = new CustomerVM
+                {
+                    CustomerID = existingCustomer.CustomerID,
+                    CustomerName = existingCustomer.CustomerName,
+                    CustomerAddress1 = existingCustomer.CustomerAddress1,
+                    CustomerAddress2 = existingCustomer.CustomerAddress2,
+                    PhoneNo = existingCustomer.PhoneNo,
+                    Email = existingCustomer.Email,
+                    Language = languages,
+                    Height = (double)existingCustomer.Height,
+                    Weight = (double)existingCustomer.Weight,
+                    CreatedBy = (int)existingCustomer.CreatedBy,
+                    CreatedAt = (DateTime)existingCustomer.CreatedAt,
+                    Id = existingCustomer.Id
+                };
+
+                return Ok(customerVM);
             }
             catch (Exception)
             {
@@ -103,11 +126,13 @@ namespace Exercise.Controllers
                 existingCustomer.Email = customer.Email;
                 existingCustomer.Weight = customer.Weight;
                 existingCustomer.Height = customer.Height;
-                existingCustomer.Language = JsonConvert.SerializeObject(customer.Language);
                 existingCustomer.UpdatedBy = 1;
                 existingCustomer.UpdatedAt = DateTime.Now;
 
-                 _Context.SaveChanges();
+                string concatenatedLanguages = string.Join(",", customer.Language);
+                existingCustomer.Language = concatenatedLanguages;
+
+                _Context.SaveChanges();
 
                 return Ok(existingCustomer);
             }
